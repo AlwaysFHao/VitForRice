@@ -167,9 +167,9 @@ class MultiClassDataSet(Dataset):
 
 
 if __name__ == '__main__':
-    file_path_1 = ''
+    file_path_test = ''
     batch_size = 8
-    train_dataset = MultiClassDataSet(file_path=file_path_1,
+    train_dataset = MultiClassDataSet(file_path=file_path_test,
                                       resize=224,
                                       mode='train')
     train_dataloader = DataLoader(dataset=train_dataset,
