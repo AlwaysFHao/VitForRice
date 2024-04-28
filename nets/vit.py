@@ -244,7 +244,7 @@ class PositionWiseFeedForward(nn.Module):
     """
     前馈神经网络
     Position-wise意为对每个点独立做，即对序列中的每个token独立过同一个MLP，即作用在输入的最后一个维度上
-    这里可选Conv1D和Linear两种实现方式，Linear考虑全局，而Conv1D则是
+    这里可选Conv1D和Linear两种实现方式，Linear考虑全局，而Conv1D则是只考虑邻近特征
     """
 
     def __init__(self, input_size,
@@ -353,7 +353,6 @@ class EncodeLayer(nn.Module):
 class Encoder(nn.Module):
     """
     Encoder
-    注意这里可选是否需要embedding，需要embedding时请指定字典长度vocab_size和pad符在字典中的索引pad_index_in_vocab
     """
 
     def __init__(self,
@@ -540,8 +539,8 @@ class VisionTransformer(nn.Module):
         x, _ = self.encoder(x)
 
         # 取出cls_token
-        # [batch, embedding_dim] -> [batch, 5]
         x = x[:, 0, :]
+        # [batch, embedding_dim] -> [batch, num_classes]
         x = self.classifier(x)
 
         return x
