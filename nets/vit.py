@@ -546,6 +546,40 @@ class VisionTransformer(nn.Module):
         return x
 
 
+def vit_pytorch(image_size: int,
+                patch_size: int,
+                num_layers: int,
+                num_heads: int,
+                embedding_dim: int,
+                mlp_hidden_dim: int,
+                num_classes: int,
+                drop_out_radio: float = 0.1):
+    """
+    vit-pytorch实现
+    :param image_size: 图像尺寸
+    :param patch_size: patch块大小
+    :param num_layers: encoder层数
+    :param num_heads: 多头注意力头数
+    :param embedding_dim: 词向量维度
+    :param mlp_hidden_dim: ffn的隐藏层维度
+    :param num_classes: 多分类类别
+    :param drop_out_radio: drop_out率
+    :return: vit-pytorch实现
+    """
+    from torchvision.models import VisionTransformer as VisionTransformerPytorch
+    return VisionTransformerPytorch(
+        image_size=image_size,
+        patch_size=patch_size,
+        num_layers=num_layers,
+        num_heads=num_heads,
+        hidden_dim=embedding_dim,
+        mlp_dim=mlp_hidden_dim,
+        dropout=drop_out_radio,
+        attention_dropout=drop_out_radio,
+        num_classes=num_classes
+    )
+
+
 if __name__ == '__main__':
     data = torch.randn(8, 3, 224, 224)
     model = VisionTransformer(

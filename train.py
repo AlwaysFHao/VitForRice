@@ -4,20 +4,22 @@ import torch
 import yaml
 from tqdm import tqdm
 
-from nets.vit import VisionTransformer
+from nets.vit import VisionTransformer, vit_pytorch
 from dataset import MultiClassDataSet
 from utils import setting_logging
 from torch.utils.data import DataLoader
 from callbacks import LossAndAccuracyHistory
-from torchvision.models import vision_transformer
+from torchvision.models import vision_transformer, vit_b_16
 import warnings
 
 warnings.filterwarnings("ignore", message="Palette images with Transparency expressed in bytes should be converted to "
                                           "RGBA images")
+# 限制可用显卡编号，如需多卡请将要添加的显卡编号（可用nvidia-smi查看）添加入字符串，用半角逗号分隔
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 if __name__ == '__main__':
     # 配置文件路径
-    config_yaml_file_path = os.path.join('model', 'vit_base_16', 'config.yaml')
+    config_yaml_file_path = os.path.join('model', 'vit_base_16_pytorch', 'config.yaml')
     # 从配置文件加载配置
     with open(config_yaml_file_path, 'r') as stream:
         config = yaml.safe_load(stream)
@@ -53,7 +55,7 @@ if __name__ == '__main__':
     is_norm_first = config['model']['is_norm_first']
 
     # 获取训练设备
-    device = (torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu'))
+    device = (torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu'))
     if torch.cuda.is_available() is True:
         logger.info(f'获取到设备 {torch.cuda.get_device_name(device.index)}')
 
@@ -75,7 +77,16 @@ if __name__ == '__main__':
             is_norm_first=is_norm_first,
             drop_out_radio=drop_out_radio
         )
-
+    elif model_name == 'Vision Transformer Pytorch':
+        model = vit_pytorch(
+            image_size=image_size,
+            patch_size=patch_size,
+            embedding_dim=embedding_dim,
+            num_classes=num_classes,
+            num_heads=num_heads,
+            num_layers=num_layers,
+            mlp_hidden_dim=ffn_hidden_size,
+            drop_out_radio=drop_out_radio)
     else:
         raise ValueError(f'当前不支持模型{model_name}')
 
@@ -85,10 +96,22 @@ if __name__ == '__main__':
         saved_state_dict = torch.load(str(os.path.join(model_saved_path, model_saved_name)))
         min_val_loss = saved_state_dict['min_val_loss']
         saved_state_dict.pop('min_val_loss')
-        model.load_state_dict(saved_state_dict)
+        # 通过自定义加载过程匹配键
+        new_model_state_dict = {}
+        for key, value in saved_state_dict.items():
+            # 修改键的方式以匹配新模型的结构
+            new_key = key.replace("module.", "")
+            new_model_state_dict[new_key] = value
+        model.load_state_dict(new_model_state_dict)
     else:
         min_val_loss = 1e100
     model = model.to(device)
+
+    # 支持和不支持gpu分两种情况处理，因为DataParallel没有GPU会报错
+    if torch.cuda.is_available():
+        # 指定使用的GPU编号(为空则是可用的全部)
+        device_ids = None
+        model = torch.nn.DataParallel(module=model, device_ids=device_ids)
 
     logger.info(f'模型结构如下：{model}')
 

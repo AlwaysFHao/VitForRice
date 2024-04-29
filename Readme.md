@@ -19,15 +19,21 @@ author: Hao Fan
 - `callbacks.py`: 用于记录训练日志的类定义；
 - `dataset.py`: 数据集加载定义，内部定义了DataSet类，只需传入多分类数据集文件路径和数据划分即可使用（具体类名可按自己需求进行更改）；
 - `train.py`: 训练脚本，仅需修改配置文件路径即可运行并开始训练模型；
-- `test.py`: 测试脚本，可以选择单张图像进行测试；
+- `test.py`: 测试脚本，测试模型在测试集上性能；
+- `predict.py`: 预测脚本，可以选择单张图像进行预测；
 - `📁 nets`: 存放模型网络结构:
   - `vit.py`: 本仓库实现的Vision Transformer，从ScaledProduct到MultiHeadAttention再到Encoder一步步重构；
-- `📁 model`: 模型配置定义、训练日志以及保存权重等：
+- `📁 model`: 模型配置定义、训练日志以及保存权重等（如有需要可以自己新建新模型的配置文件）：
   - `📁 vit_base_16`: 重构vit-base-16模型的配置文件：
     - `📁 logs`: 训练日志文件：
       - `📁 loss_and_acc_{time}`: {time}时刻开始训练的日志，包含accuracy和loss等的记录；
-    - `📁 weights`: 存放权重文件pth，由于github仓库上传限制，已将在水稻病虫害多分类数据集上预训练的权重上传至 [百度网盘](https://pan.baidu.com/share/init?surl=Hub7i6wy4_s0-9fLbs7OHw&pwd=elw8)， 请下载后放入本文件夹；
-  - `config.yaml`: 模型配置文件，包括模型定义超参和训练超参以及数据集路径等；
+    - `📁 weights`: 存放权重文件pth，由于github仓库上传限制，已将在水稻病虫害多分类数据集上预训练的权重上传至 [百度网盘](https://pan.baidu.com/s/1YFkDIgh4RWJphUvqyvBn0g?pwd=1296)， 请下载后放入本文件夹；
+    - `config.yaml`: 模型配置文件，包括模型定义超参和训练超参以及数据集路径等；
+  - `📁 vit_base_16_pytorch`: pytorch官方实现vit-base-16模型的配置文件
+    - `📁 logs`: 训练日志文件：
+      - `📁 loss_and_acc_{time}`: {time}时刻开始训练的日志，包含accuracy和loss等的记录；
+    - `📁 weights`: 存放权重文件pth，由于github仓库上传限制，已将在水稻病虫害多分类数据集上预训练的权重上传至 [百度网盘](https://pan.baidu.com/s/1YFkDIgh4RWJphUvqyvBn0g?pwd=1296)， 请下载后放入本文件夹；
+    - `config.yaml`: 模型配置文件，包括模型定义超参和训练超参以及数据集路径等；
 - `📁 rice_data`: 水稻病虫害数据集，包含各个类别的文件夹以及映射json（之后可以替换为自己的多分类数据集）：
   - `label2name.json`: 类别索引标签和类别名的对应json字典；
   - `...📁 类别名`: 每个类别的图片，由于数据集版权问题，这里只能上传少部分图片以供模型测试；
@@ -50,7 +56,7 @@ model = VisionTransformer(
 print(model(data).shape)
 ```
 对于模型配置部分，如需自定义模型超参进行训练，可以通过在`📁 model`中新建模型文件夹，并按照 <u>项目结构介绍</u> 中的文件结构新建`📁 logs`和`📁 weights`文件夹
-（`📁 loss_and_acc_{time}`不用新建，会自动生成），然后再按照`config.yaml`文件中定义的进行配置即可（[config.yaml](model/vit_base_16/config.yaml)）。
+（`📁 loss_and_acc_{time}`不用新建，会自动生成），然后再按照`config.yaml`文件中定义的进行配置即可（[config.yaml](model/vit_base_16_mlp768_head8/config.yaml)）。
 
 ### 数据集加载
 另外多分类数据集部分主要是使用`MultiClassDataSet`模块（[dataset.py](dataset.py)），仅需在实例化的时候传入数据集路径以及数据集切分要求即可，可用以下代码进行测试：
@@ -92,5 +98,16 @@ config_yaml_file_path = r'你的配置文件路径'
 直接运行：
 ```shell
 python test.py
+```
+
+### 预测脚本运行
+修改完`predict.py`（[predict.py](predict.py)）中的
+```python
+# 配置文件路径
+config_yaml_file_path = r'你的配置文件路径'
+```
+直接运行：
+```shell
+python predict.py
 ```
 之后终端输入要测试的图片路径即可（可以直接拿rice_data中的采样数据测试）。

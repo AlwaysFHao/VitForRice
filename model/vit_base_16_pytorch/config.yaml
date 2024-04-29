@@ -1,5 +1,5 @@
 model:
-  model_name: Vision Transformer
+  model_name: Vision Transformer Pytorch
   image_size: 224
   patch_size: 16
   embedding_dim: 768
@@ -16,12 +16,12 @@ model:
   is_norm_first: True
 
 train:
-  logger_name: 'Vit_For_Rice'
+  logger_name: 'Vit_Pytorch_For_Rice'
   lr: 0.000025
   Epochs: 50
   batch_size: 32
-  model_saved_path: 'model/vit_base_16/weights'
+  model_saved_path: 'model/vit_base_16_pytorch/weights'
   model_saved_name: 'best_epoch_model.pth'
   dataset_path: './rice_data'
   weight_decay: 0.0001
-  save_log_dir: './model/vit_base_16/logs'
+  save_log_dir: './model/vit_base_16_pytorch/logs'

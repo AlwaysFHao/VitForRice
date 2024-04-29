@@ -4,13 +4,13 @@ model:
   patch_size: 16
   embedding_dim: 768
   num_classes: 13
-  num_heads: 12
+  num_heads: 8
   num_layers: 12
   pos_embedding_is_Parameter: True
   representation_size: 0
-  k_dim: 64
-  v_dim: 64
-  ffn_hidden_size: 3072
+  k_dim: 96
+  v_dim: 96
+  ffn_hidden_size: 0
   ffn_mode: 'linear'
   drop_out_radio: 0.1
   is_norm_first: True
@@ -18,7 +18,7 @@ model:
 train:
   logger_name: 'Vit_For_Rice'
   lr: 0.000025
-  Epochs: 50
+  Epochs: 100
   batch_size: 32
   model_saved_path: 'model/vit_base_16/weights'
   model_saved_name: 'best_epoch_model.pth'
